@@ -1,0 +1,29 @@
+Python support for IBM Db2 for LUW
+Installation steps for python ibm_db driver in window 
+
+1. Install Python 3.7 <= 3.12. The minimum python version supported by driver is python 3.7 and the latest version supported is python 3.12
+$ python --version
+Python 3.12.4
+
+2. Install Microsoft C++ Build Tools
+https://visualstudio.microsoft.com/visual-cpp-build-tools/
+
+Visual Studio Build Tools 2022(2) 
+Desktop development with C++ (Don't unchecked default selection)
+Window 11 SDK (check if not wtih latest)
+Window 10 SDK (check if not wtih latest)
+MSVC v142 - VS 2019 C++ x64/X86 build tools (check if not wtih latest)
+
+3. install python ibm_db driver
+
+pip install ibm_db
+#pip uninstall ibm_db
+pip list
+import os
+os.add_dll_directory('E:\\python_db2_project\\python-ibmdb\\clidriver\\bin')
+import ibm_db
+
+
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.
+
+It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.

@@ -1,0 +1,425 @@
+Changing colour of text and background of terminal?
+echo -e "\e[1;97;40m"
+export PS1='\[\033[1;35m\]\u\[\033[00m\]@\[\033[1;35m\]\H\[\033[00m\]:\[\033[1;33m\]\W\[\033[00m\] \$\[\033[1;34m '
+
+How to make 'python' program command execute Python 3?
+update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+
+docker pull redhat/ubi9
+docker images
+docker rmi 7b13db19b1f3
+docker ps
+docker logs -f <CONTAINER ID>
+yum install <package name>
+
+docker pull ibmcom/db2
+
+• Create Volume for /database on node1
+docker volume create db2srv_empty_hadr_h1
+
+• Create Volume for /database on node2
+docker volume create db2srv_empty_hadr_h2
+
+• Create volume for /hadr
+docker volume create db2srv_empty_hadr_share
+
+• Create network to enable dns hostname/containernameresolving
+docker network create -d bridge idug
+
+• Run DB2 container
+docker run -itd --name db2srv_hadr_node1 --privileged --ipc=host -p 50000 -p 55000 -e LICENSE=accept -e LICENSE=accept -e DB2INST1_PASSWORD=db2inst1 -v db2srv_empty_hadr_h1:/database -v db2srv_empty_hadr_share:/hadr -e DBNAME=DOCHADR -e ETCD_ENDPOINT=xxx:2379,xxx:2379,xxx:2379 -e HADR_ENABLED=true -h db2srv_hadr_node1 --network=idug ibmcom/db2
+
+docker run -itd --name db2srv_hadr_node2 --privileged --ipc=host -p 50000 -p 55000 -e LICENSE=accept -e DB2INST1_PASSWORD=db2inst1 -v db2srv_empty_hadr_h2:/database -v db2srv_empty_hadr_share:/hadr -e DBNAME=DOCHADR -e ETCD_ENDPOINT=xxx:2379,xxx:2379,xxx:2379 -e HADR_ENABLED=true -h db2srv_hadr_node2 --network=idug ibmcom/db2
+
+docker run -itd -h db2linux --name db2linux --privileged --ipc=host -p 25010 -p 25020 -e ETCD_ENDPOINT=xxx:2379,xxx:2379,xxx:2379 --network=idug 159a1e67312e
+
+docker run -h ubuntu -itd --name ubuntu --privileged --ipc=host -p 25010 -p 25020 -e ETCD_ENDPOINT=xxx:2379,xxx:2379,xxx:2379 --network=idug 35a88802559d
+
+docker exec -ti db2srv_hadr_node1 bash -c "su - db2inst1"
+docker exec -ti db2srv_hadr_node2 bash -c "su - db2inst1"
+
+Utilizing IBM DB2 with Python:
+IBM DB2 INSTANCE: THIS COULD BE ON-PREMISE OR A CLOUD OFFERING.
+PYTHON: ENSURE YOU'VE INSTALLED PYTHON 3.X ON YOUR MACHINE.
+IBM_DB PYTHON PACKAGE: INSTALL IT USING PIP:
+
+cat /etc/os-release
+python3 --version
+python3 -m pip --version
+pip install ibm_db
+pip install --upgrade pip
+
+---How to add containers to same network in Docker
+First, define your user-defined bridge network:
+docker network create your-network-name
+
+Then, connect your containers to the network that you just created:
+docker network connect your-network-name container-name
+
+Or connect with the run command:
+docker run --network=your-network-name your-image
+
+docker inspect network-name
+
+docker exec -ti db2srv_hadr_node1 bash -c "su - db2inst1"
+rhel9.4_server
+C:\Program Files\Docker\Docker>"Docker Desktop.exe"
+docker login
+
+docker ps -a
+docker ps -l
+docker ps -n=-1
+docker ps -s -- (total file sizes)
+docker container ls
+docker container ls -a
+docker rm $(docker ps -aq) -- clean them all
+docker rm -f $(docker ps -a -q)   -- stop all the Docker containers (force)
+
+docker stack ls
+docker service ls
+docker image ls
+docker container ls
+docker network ls
+
+docker stop NAMES -- from docker images command
+docker rm NAMES -- from docker images command
+docker rmi "IMAGE ID" -- from docker images command
+
+docker start/stop/stats db2srv_hadr_node1
+docker inspect db2srv_hadr_node1
+docker inspect db2srv_hadr_node2
+db2pd -hadr -db dochadr -repeat| grep -iE "HADR_ROLE|HADR_SYNCMODE|HADR_STATE|PRIMARY_MEMBER_HOST|PRIMARY_MEMBER_HOST"
+
+select hadr_role,hadr_state,hadr_syncmode,hadr_connect_status,primary_member_host,standby_member_host from table (mon_get_hadr(0));
+
+
+{"auths":{"cloud.openshift.com":{"auth":"b3BlbnNoaWZ0LXJlbGVhc2UtZGV2K29jbV9hY2Nlc3NfOTlmNzZhMmEwNDhkNGIzMzliZjcyNzUxMWNhNDZlMzQ6TUdETTBHSDFTQjUwUFFJNzczUkdZTTVYRzJZUlU0VzlLSFZON1hCUDcyWkk3WTk0OUFRU0hURjZMVDlZT1pZSA==","email":"someetei@gmail.com"},"quay.io":{"auth":"b3BlbnNoaWZ0LXJlbGVhc2UtZGV2K29jbV9hY2Nlc3NfOTlmNzZhMmEwNDhkNGIzMzliZjcyNzUxMWNhNDZlMzQ6TUdETTBHSDFTQjUwUFFJNzczUkdZTTVYRzJZUlU0VzlLSFZON1hCUDcyWkk3WTk0OUFRU0hURjZMVDlZT1pZSA==","email":"someetei@gmail.com"},"registry.connect.redhat.com":{"auth":"fHVoYy1wb29sLTQ4NWZmMjMyLWVkYWMtNDRlMS1hOGU3LWQ1YWFlOTRlYWI4MjpleUpoYkdjaU9pSlNVelV4TWlKOS5leUp6ZFdJaU9pSTJOR1UyTnprNU9XSXpZbUUwT0RZelltRmlNV1poWm1Oa05qSTFPVEk1WXlKOS5ZZnRydXBReS1jYnVUZWNEU2pyLTdLTVMzaVYtbENfVGRUTmlVRV93S2VIU2MzRTZBSUFCODAtUEx3SHQwc1dwNlAtZXRhbFRXdDZaWUZXTkNkOUduc3ZwS1o3ODZnZzB0VTd4c2k0UVBCY0Q2MGxISXFieGFCaEswbXYzdU5wWFhyVXp3TW1aY2tQZ3ZUajVlRHJpR09ZOERkSWJnU3NYczMwYkNSb3dPcVBFMzQ5LThtZjc5VnAzRUdXR3BXMjR4T183QUNRWTYxeE9NZ2g4MEFVUXd6TTRsTmVnUkJ4dzlGM2MweUMzaU80VkliM2V6djVqYkhTTHBTcy1wTE9yZktDRVpQWlgyZDRfTkU2eWhVWU9WSFZoNG80TS1GR0luZkc5cUp0OXdhclBJQW1vckt0Vk1ZSXBmNHNUT2FsVzRMTzFpWjdJM084MzgxRzF1RVZnZXFqcmJ4S2xOUFN5VzBvaXk3RHdFQ1dTdEJjOTM2WnVLRDVDbEQ4ZEN6U2FsVWhGWWZEMmFWYURHZEN5TGFQQVFDXzAwX0JuZXdfSXFmX1FpQWlGcTFOVE9BSmIzVzZ5bGlSeVBULWI0cTJDQXc4allYUWN0bWk5dC16SHVxMXU2dC1weFhUb05qRHVVdVZpWjcxbms4MmVkbUxMZ0pjRFhXak92Q1hqd3NPcXhEMVZWUnNRQTVPMk11LVBtclN5bF8yeHpLUVhhSEMyME53Vnc0T0x0dVZpMVJMVzhEbU90MnhFU1p0NEJPY2FLY09jNlYyMVlSYlZzRkVqX2pPNjRTa1FVcVJySU5hdTMtcGdkRi1YUHBtQ0NZOGZuZ3FvSkR5aXBDTl9ZWTJ4ZUgyZmU0UElBUXlwUnlySUFKYkVYM3VUbklHTUp5UF9mSmppOVlPLWdfTQ==","email":"someetei@gmail.com"},"registry.redhat.io":{"auth":"fHVoYy1wb29sLTQ4NWZmMjMyLWVkYWMtNDRlMS1hOGU3LWQ1YWFlOTRlYWI4MjpleUpoYkdjaU9pSlNVelV4TWlKOS5leUp6ZFdJaU9pSTJOR1UyTnprNU9XSXpZbUUwT0RZelltRmlNV1poWm1Oa05qSTFPVEk1WXlKOS5ZZnRydXBReS1jYnVUZWNEU2pyLTdLTVMzaVYtbENfVGRUTmlVRV93S2VIU2MzRTZBSUFCODAtUEx3SHQwc1dwNlAtZXRhbFRXdDZaWUZXTkNkOUduc3ZwS1o3ODZnZzB0VTd4c2k0UVBCY0Q2MGxISXFieGFCaEswbXYzdU5wWFhyVXp3TW1aY2tQZ3ZUajVlRHJpR09ZOERkSWJnU3NYczMwYkNSb3dPcVBFMzQ5LThtZjc5VnAzRUdXR3BXMjR4T183QUNRWTYxeE9NZ2g4MEFVUXd6TTRsTmVnUkJ4dzlGM2MweUMzaU80VkliM2V6djVqYkhTTHBTcy1wTE9yZktDRVpQWlgyZDRfTkU2eWhVWU9WSFZoNG80TS1GR0luZkc5cUp0OXdhclBJQW1vckt0Vk1ZSXBmNHNUT2FsVzRMTzFpWjdJM084MzgxRzF1RVZnZXFqcmJ4S2xOUFN5VzBvaXk3RHdFQ1dTdEJjOTM2WnVLRDVDbEQ4ZEN6U2FsVWhGWWZEMmFWYURHZEN5TGFQQVFDXzAwX0JuZXdfSXFmX1FpQWlGcTFOVE9BSmIzVzZ5bGlSeVBULWI0cTJDQXc4allYUWN0bWk5dC16SHVxMXU2dC1weFhUb05qRHVVdVZpWjcxbms4MmVkbUxMZ0pjRFhXak92Q1hqd3NPcXhEMVZWUnNRQTVPMk11LVBtclN5bF8yeHpLUVhhSEMyME53Vnc0T0x0dVZpMVJMVzhEbU90MnhFU1p0NEJPY2FLY09jNlYyMVlSYlZzRkVqX2pPNjRTa1FVcVJySU5hdTMtcGdkRi1YUHBtQ0NZOGZuZ3FvSkR5aXBDTl9ZWTJ4ZUgyZmU0UElBUXlwUnlySUFKYkVYM3VUbklHTUp5UF9mSmppOVlPLWdfTQ==","email":"someetei@gmail.com"}}}
+
+
+
+docker run -h db2server1 --name db2server1 --privileged --ipc=host -p 50000 -p 55000 -e LICENSE=accept -e DB2INST1_PASSWORD=db2inst1 -e DBNAME=PILOTDB -e HADR_ENABLED=true -e ETCD_ENDPOINT=IP1:PORT1,IP2:PORT2,IP3:PORT3 -v /home/db2server_fs/database:/database -v /nfs/shared:/hadr ibmcom/db2
+
+docker run -h db2server2 --name db2server2 --privileged --ipc=host -p 50000 -p 55000 -e LICENSE=accept -e DB2INST1_PASSWORD=db2inst1 -e DBNAME=PILOTDB -e HADR_ENABLED=true -e ETCD_ENDPOINT=IP1:PORT1,IP2:PORT2,IP3:PORT3 -v /home/db2server_fs/database:/database -v /nfs/shared:/hadr ibmcom/db2
+
+docker ps -a
+docker cp /hostfile 7a834eba7d8b:/database/backup
+docker cp 68f044bfaeeb:/root/tatu-key-ecdsa.* /temp
+docker cp /hostfile cae94074a78b:/tmp
+
+docker cp 159a1e67312e 
+
+	
+x=1;
+while [ $x -le 800 ]
+do
+db2 -v "INSERT INTO DEMO (value) values ($x)";
+sleep 3;
+x=$(( $x +1 ));
+done
+
+db2pd -hadr -db dochadr -repeat| grep -iE "HADR_ROLE|HADR_SYNCMODE|HADR_STATE|PRIMARY_MEMBER_HOST|PRIMARY_MEMBER_HOST"
+
+db2 update db cfg for sample using HADR_LOCAL_HOST db2-ec2 HADR_LOCAL_SVC 50012 HADR_REMOTE_HOST db2-server1 HADR_REMOTE_SVC 50010 HADR_REMOTE_INST db2inst1 HADR_SYNCMODE SUPERASYNC
+db2 update db cfg for sample using HADR_TARGET_LIST "db2-server2:50011|db2-ec2:50012"
+db2 update db cfg for sample using HADR_TARGET_LIST "db2-server1:50010|db2-ec2:50012"
+
+CREATE SERVICE CLASS BATCH
+CREATE WORKLOAD WORKLOAD1 APPLNAME(‘batch1.exe’) SERVICE CLASS BATCH
+
+CREATE TABLESPACE TS_STMT MANAGED BY AUTOMATIC STORAGE;
+CREATE EVENT MONITOR WLM_EVMON
+FOR ACTIVITIES WRITE TO TABLE
+ACTIVITY (TABLE WLM.ACTIVITY IN TS_STMT),
+ACTIVITYSTMT (TABLE WLM.ACTIVITYSTMT IN TS_STMT),
+ACTIVITYVALS (TABLE WLM.ACTIVITYVALS IN TS_STMT),
+ACTIVITYMETRICS (TABLE WLM.ACTIVITYMETRICS IN TS_STMT),
+CONTROL (TABLE WLM.CONTROL IN TS_STMT);
+
+ALTER SERVICE CLASS SYSDEFAULTSUBCLASS UNDER SYSDEFAULTUSERCLASS COLLECT ACTIVITY DATA ON COORDINATOR WITH DETAILS;
+SET EVENT MONITOR WLM_EVMON STATE 1;
+
+ALTER SERVICE CLASS SYSDEFAULTSUBCLASS UNDER SYSDEFAULTUSERCLASS COLLECT ACTIVITY DATA NONE;
+SET EVENT MONITOR WLM_EVMON STATE 0;
+
+
+export to sql-raw-data.csv of del modified by coldel^
+select A.ACTIVITY_ID, A.UOW_ID,
+A.TIME_STARTED ,rtrim(B.STMT_TEXT) AS STMT,
+C.STMT_VALUE_DATA,C.STMT_VALUE_INDEX, C.STMT_VALUE_TYPE ,'#$'
+from WLM.ACTIVITYSTMT B JOIN WLM.ACTIVITIES A
+ON (A.APPL_ID=B.APPL_ID and A.UOW_ID=b.UOW_ID AND A.ACTIVITY_ID=B.ACTIVITY_ID AND A.APPL_ID=B.APPL_ID)
+LEFT OUTER JOIN WLM.ACTIVITYVALS C
+on A.ACTIVITY_ID=C.ACTIVITY_ID AND A.APPL_ID=C.APPL_ID and A.UOW_ID=C.UOW_ID
+ORDER BY a.TIME_STARTED, a.ACTIVITY_ID,A.UOW_ID,C.STMT_VALUE_INDEX;
+
+
+Run the script using the following command with Python installed on it, For example, on EC2:
+python3 ./formatwlm.py sql-raw-data.csv
+
+The Python script generates two output files:
+./sql-statement.txt – Contains the parsed SQL statements
+./sql-parms.txt – Contains the corresponding parameters for each SQL statement
+
+
+Replay the Db2 LUW workload in Amazon RDS for Db2
+Catalog the RDS database on the EC2 instance where the Db2 client installed:
+
+db2 catalog tcpip node target remote [RDS for Db2 endpoint] server [RDS for Db2 port number]
+db2 catalog db benck at node target authentication SERVER_ENCRYPT
+
+Now you can use db2batch to run the SQL statements with parameters. In the following command, we use db2batch to connect to the RDS for Db2 database (benck) remotely, and run the SQL statement in sql-statement.txt, along with literals for the host variable from sql-parms.txt:
+
+db2batch -d benck -a userid/passwd -f sql-statement.txt -m sql-parms.txt -iso CS -z sql-statement.out
+
+Run queries repeatedly by specifying a block number
+db2batch -d benck -a userid/passwd -f sql-statement.txt -m sql-parms.txt -g on -iso CS -z sql-statement.out
+
+Run multiple workloads in parallel
+
+#!/bin/bash
+count=0
+while [ $count -lt 10 ]
+do
+    DATE=`date +%y%m%d%H%M%S%N`
+	db2batch -d benck -a userid/passwd -f sql-statement.txt -m sql-parms.txt -g on -iso CS -z sql-statement.out.$DATE
+	let count=count+1
+done
+
+Amazon EBS(Elastic Block Store)
+Amazon S3(Simple Storage Service)
+AWS EFS(Elastic file system)
+
+db2rfpen 
+
+Approach 1: Db2 log shipping
+Using Amazon S3:
+Using Amazon EFS:
+
+Approach 2: Db2 highly available and disaster recovery (HADR) auxiliary standby
+
+
+groupadd -g 888 db2iadm
+groupadd -g 889 db2fadm
+
+useradd -u 1004 -g db2iadm -m -d /home/db2inst1 db2inst1 
+useradd -u 1003 -g db2fadm -m -d /home/db2fenc1 db2fenc1 
+
+passwd db2inst1
+passwd db2fenc1
+
+db2icrt -u db2fenc1 db2inst1
+
+our identification has been saved in /root/tatu-key-ecdsa
+Your public key has been saved in /root/tatu-key-ecdsa.pub
+The key fingerprint is:
+
+docker build -t redhat1 .
+docker run -itd -h redhat1 --name redhat1 --privileged --ipc=host -p 2022:22 -p 25010 -p 25020 -e ETCD_ENDPOINT=xxx:2379,xxx:2379,xxx:2379 --network=idug redhat1
+
+docker context create my-remote-docker-machine --docker "host=ssh://sshadmin@localhost:2022"
+
+ssh sshadmin@localhost -p 2022
+sshadmin@localhost:2022 --- VS code
+db2inst1@localhost:2022
+
+ssh://sshadmin@localhost:2022
+
+Relaunch From Docker Commit 
+Instead of launching a new container from zero, we can commit the old Docker container to create a new Docker image, and use that to start a new container with the right ports open
+$ docker stop db2linux
+$ docker commit db2linux db2linux-image
+$ docker commit 653711e9ba22  ubuntu1/db2:version1
+docker commit --change "ENV DEBUG=true" c3f279d17e0a  svendowideit/testimage:version3
+docker commit --change='CMD ["apachectl", "-DFOREGROUND"]' -c "EXPOSE 80" c3f279d17e0a  svendowideit/testimage:version4
+docker images -f "dangling=true" -q
+$ docker rm db2linux
+$ docker run -d -p 83:80 --name db2linux db2linux-image
+#docker run -itd -h db2linux --name db2linux --privileged --ipc=host -p 2022:22 -p 25010 -p 25020 -e ETCD_ENDPOINT=xxx:2379,xxx:2379,xxx:2379 --network=idug db2linux-image
+
+----E: Package 'libaio1' has no installation candidate----
+apt search libaio
+Sorting... Done
+Full Text Search... Done
+libaio-dev/noble 0.3.113-6build1 amd64
+  Linux kernel AIO access library - development files
+
+libaio1t64/noble 0.3.113-6build1 amd64
+
+apt-get install libaio-dev
+apt-get install libaio1t64
+
+ln -s /lib/x86_64-linux-gnu/libaio.so.1t64 /lib/libaio.so.1
+----db2start: error while loading shared libraries: libaws-cpp-sdk-transfer.so: cannot open shared object file: No such file or directory--
+cd /opt/ibm/db2/V11.5/lib64/awssdk/UBUNTU
+ls -l 22.04
+cp -rp 22.04 24.04
+ls -l 24.04
+cd /opt/ibm/db2/V11.5/lib64
+ln -sf awssdk/UBUNTU/24.04/libaws-cpp-sdk-core.so libaws-cpp-sdk-core.so
+ln -sf awssdk/UBUNTU/24.04/libaws-cpp-sdk-kinesis.so libaws-cpp-sdk-kinesis.so 
+ln -sf awssdk/UBUNTU/24.04/libaws-cpp-sdk-s3.so libaws-cpp-sdk-s3.so
+ln -sf awssdk/UBUNTU/24.04/libaws-cpp-sdk-transfer.so libaws-cpp-sdk-transfer.so
+ls -l libaws*
+
+[db2inst1@db2linux ~]$ cat .profile 
+
+# The following three lines have been added by IBM DB2 instance utilities.
+if [ -f /home/db2inst1/sqllib/db2profile ]; then
+    . /home/db2inst1/sqllib/db2profile
+fi
+export PATH=$PATH:/opt/IBM/db2/V10.1/bin
+apt-get install vim
+ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime
+apt-get update && apt-get install python3 python3-pip -y
+ls /usr/bin/python*
+which python
+ln -s /usr/bin/python3 /usr/bin/python
+dpkg --configure -a
+ls /usr/bin/python* 
+apt-get update && apt-get remove python3.5
+apt-get update && apt-get remove --auto-remove python3.5
+apt-get update && apt-get purge python3.5
+apt-get update && apt-get purge --auto-remove python3.5
+
+ssh-keygen -t rsa -b 4096
+ssh-keygen -t dsa 
+ssh-keygen -t ecdsa -b 521
+ssh-keygen -t ed25519
+ssh-add <pvtkeyfile>
+ssh-add -D
+ssh-keygen -l -f id_ecdsa.pub -- How to Check SSH Fingerprint of a Key
+
+-----how to solve this kind of issue--
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+It is also possible that a host key has just been changed.
+The fingerprint for the ECDSA key sent by the remote host is
+SHA256:ReQxPum60nYi1AtesjJhIM6TbPKi4Lta19HGS2LnIWg.
+Please contact your system administrator.
+Add correct host key in C:\\Users\\USER/.ssh/known_hosts to get rid of this message.
+Offending ECDSA key in C:\\Users\\USER/.ssh/known_hosts:4
+ECDSA host key for [localhost]:2022 has changed and you have requested strict checking.
+Host key verification failed.
+
+delete entries from (C:\Users\USER\.ssh\known_hosts) and fresh entry will add next time when we your ssh login
+
+---how to solve this kind of issue---
+root@ubuntu2:/# pip install ibm_db
+error: externally-managed-environment
+
+× This environment is externally managed
+╰─> To install Python packages system-wide, try apt install
+    python3-xyz, where xyz is the package you are trying to
+    install.
+    
+    If you wish to install a non-Debian-packaged Python package,
+    create a virtual environment using python3 -m venv path/to/venv.
+    Then use path/to/venv/bin/python and path/to/venv/bin/pip. Make
+    sure you have python3-full installed.
+    
+    If you wish to install a non-Debian packaged Python application,
+    it may be easiest to use pipx install xyz, which will manage a
+    virtual environment for you. Make sure you have pipx installed.
+    
+    See /usr/share/doc/python3.12/README.venv for more information.
+
+pip install ibm_db --break-system-packages
+pip uninstall ibm_db --break-system-packages
+
+--- Download IBM Data Server Driver for ODBC and CLI---
+
+https://www.ibm.com/support/pages/db2-odbc-cli-driver-download-and-installation-information
+if you already install DB2 server or cliet installed no need to download odbc/cli driver
+
+cp download/v11.5.9_linuxx64_odbc_cli.tar.gz /homedir
+cd /homedir
+tar -zvxf v11.5.9_linuxx64_odbc_cli.tar.gz
+cd /homedir/odbc_cli/clidriver/cfg
+
+---cat >/home/db2inst1/odbc_cli/clidriver/cfg/db2dsdriver.cfg---
+---cat >/home/db2inst1/sqllib/cfg/db2dsdriver.cfg--- if already installed db2 server/client 
+
+<configuration>
+   <dsncollection>
+      <dsn alias="db2dns" name="SAMPLE" host="localhost" port="50000"/>
+   </dsncollection>
+   <databases>
+      <database name="SAMPLE" host="localhost" port="50000">
+		 <parameter name="CommProtocol" value="TCPIP"/>
+		 <parameter name="UID" value="DB2INST1"/>
+		 <parameter name="IPCInstance" value="DB2INST1"/>
+         <parameter name="CurrentSchema" value="DB2INST1"/>
+      </database>
+   </databases>
+</configuration>
+
+--cat >/home/db2inst1/odbc_cli/clidriver/cfg/db2cli.ini----
+---cat >/home/db2inst1/sqllib/cfg/db2cli.cfg--- if already installed db2 server/client 
+[db2dns]
+uid=db2inst1
+pwd=db2inst1
+autocommit=0
+TableType="'TABLE','VIEW','SYSTEM TABLE'"
+
+---cd homedir --> vi .bashrc--
+if you have DB2 server already installed then
+export LD_LIBRARY_PATH="/home/db2inst1/sqllib/lib64"
+
+--otherwise add following variable--
+export LD_LIBRARY_PATH="/home/db2inst1/odbc_cli/clidriver/lib"
+
+--cd /home/db2inst1/odbc_cli/clidriver/bin---
+./db2cli validate -dsn db2dns -connect -user db2inst1 -passwd db2inst1
+-- cd /home/db2inst1/sqllib/bin---
+./db2cli validate -dsn db2dns -connect -user db2inst1 -passwd db2inst1
+
+---download unixODBC driver manager from https://www.unixodbc.org/ -----
+cp download/unixODBC-2.3.12.tar.gz /homedir
+cd /homedir
+tar -zvxf unixODBC-2.3.12.tar.gz
+cd unixODBC-2.2.11
+./configure --prefix=$HOME --enable-gui=no --enable-drivers=no
+make
+make install
+export ODBCHOME=~/etc
+export ODBCINI=~/odbc.ini
+
+
+--prepare odbcinst.ini --
+cd homedir
+cat > odbcinst.ini
+[ODBC Drivers]
+db2driver = Installed
+
+[db2driver]
+Driver = /home/db2inst1/odbc_cli/clidriver/lib/libdb2.so
+#Driver = /home/db2inst1/sqllib/lib64/libdb2.so ---If db2 server/client already installed
+
+--prepare odbc.ini --
+cd homedir
+cat > odbc.ini
+[ODBC Drivers]
+db2dns = db2driver
+
+[db2dns]
+Driver = /home/db2inst1/odbc_cli/clidriver/lib/libdb2.so
+#Driver = /home/db2inst1/sqllib/lib64/libdb2.so ---If db2 server/client already installed
+Description = this is test descr
+
+--install python odbc libraries for dsn connection testing from python code---
+pip install pyodbc --break-system-packages
+
+cat > test.py
+import pyodbc
+
+conn = pyodbc.connect("DSN=db2dns")
+print("Connected successfully..!!")
+cursor=conn.cursor()
+cursor.execute("select id from abc")
+rows=cursor.fetchall()
+print(rows)
+
+python test.py
+---git clone command in linux--
+git clone https://github.com/IBM/db2-python.git
+

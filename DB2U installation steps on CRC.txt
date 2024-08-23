@@ -1,0 +1,198 @@
+whereis python 
+which python
+cat /etc/os-release 
+
+1. Download Red Hat OpenShift Local (formerly Red Hat CodeReady Containers) from below 
+
+https://console.redhat.com/openshift/create/local
+
+#crc stop
+#crc delete
+#crc cleanup
+crc setup
+#crc start
+crc start -c 8 -m 16384 -d 60 -p pull-secret.txt
+#crc start -c 8 -m 16384 -d 60 --log-level debug -- for debug
+crc status
+
+2. Download OpenShift CLI Command Line Tools:
+
+https://console-openshift-console.apps-crc.testing/command-line-tools
+
+Started the OpenShift cluster.
+
+The server is accessible via web console at:
+https://console-openshift-console.apps-crc.testing
+
+Log in as administrator:
+  Username: kubeadmin
+  Password: wIsQR-6GXg5-JjrCh-zBEUr
+
+Log in as user:
+  Username: developer
+  Password: developer
+SA52 8000 0500 6080 1130 4958		
+
+Use the 'oc' command line interface:
+  > @FOR /f "tokens=*" %i IN ('crc oc-env') DO @call %i
+  > oc login -u developer https://api.crc.testing:6443
+
+
+  
+3. Installing the DB2 Operators
+Once you have this up and running, you must enable the IBM Operator Catalog in your Red Hat OpenShift clusters Operator Catalog either CLI/Web console:
+
+oc login -u kubeadmin https://api.crc.testing:6443 
+wIsQR-6GXg5-JjrCh-zBEUr
+oc whoami
+oc project
+oc project db2-dev
+oc project db2-dev --short=true
+
+mkdir /mnt/catdir
+cat > /mnt/catdir/catalog_source.yaml
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: ibm-operator-catalog
+  namespace: openshift-marketplace
+spec:
+  displayName: IBM Operator Catalog
+  publisher: IBM Content
+  sourceType: grpc
+  image: icr.io/cpopen/ibm-operator-catalog:latest
+  updateStrategy:
+    registryPoll:
+      interval: 45m
+	  
+chmod 777 /mnt/catdir/catalog_source.yaml 	  
+cat /mnt/catdir/catalog_source.yaml
+oc apply -f /mnt/catdir/catalog_source.yaml -n openshift-marketplace
+
+
+Verify the CLI installation
+
+oc get CatalogSources ibm-operator-catalog -n openshift-marketplace
+oc get subscription ibm-operator-catalog-subscription -oyaml | grep installPlanApproval
+oc get catalogsource,pods -n openshift-marketplace
+oc get pods -n openshift-marketplace
+
+oc logs ibm-operator-catalog-4p9fl -n openshift-marketplace
+oc describe pod ibm-operator-catalog-b7b7q  -n openshift-marketplace
+
+-----Uninstalling the operators and catalog sources(Optional)
+Click Administration > Cluster Settings.
+Click Configuration tab, then click OperatorHub.
+Select the Sources tab.
+Delete the relevant catalog sources.
+
+
+Depending on your network and system, it may take a few moments for this to appear in the Operator Catalog.
+
+Shortly after, switch to your Operator Hub Window and select the IBM Operator Catalog option on the left-hand side. Then select the Database category for the Hub — you will then see the IBM Db2 Operator.
+
+4. Preparing to install Db2
+While you are waiting for the IBM Operator Catalog to load, you can prepare the persistent volumes associated with the CodeReady Containers (CRC) deployment so they are suitable for Db2’s usage. 
+Normally, you would deploy on an NFS, OCS or Ceph.
+
+You can do the following either from a command line by logging onto the server using the oc command as displayed after you start the CRC server or via the compute menu and clicking on Node then Terminal:
+Log in as administrator:
+Username: kubeadmin
+Password: wIsQR-6GXg5-JjrCh-zBEUr
+
+oc login -u kubeadmin https://api.crc.testing:6443
+
+oc get nodes
+#oc debug node/$(oc get nodes | grep crc | cut -d " " -f 1)
+
+chroot /host
+mkdir /mnt/pv-data
+sudo setsebool -P container_manage_cgroup true
+chmod 777 -R /mnt/pv-data
+sudo chgrp root -R /mnt/pv-data
+sudo semanage fcontext -a -t container_file_t "/mnt/pv-data(/.*)?"
+sudo restorecon -Rv /mnt/pv-data
+exit
+
+mylist=$(oc get pv | grep pv | grep Available | cut -d " " -f1)
+
+for i in $mylist ; do  oc patch pv $i -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}' ; done
+
+5. Getting the Db2 Operator ready
+oc new-project db2-dev
+
+#
+## Set the variables to the correct values
+#
+## Use cp for the value of the docker-username field
+#
+ENTITLEDKEY="<Entitlement Key from MyIBM> "
+EMAIL="<email ID associated with your IBM ID>"
+NAMESPACE="<project or Namespace Name for Db2 project>"
+
+oc create secret docker-registry ibm-registry --docker-server=cp.icr.io --docker-username=cp --docker-password=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJJQk0gTWFya2V0cGxhY2UiLCJpYXQiOjE3MTkwMDc3NTIsImp0aSI6IjIwZTNmNzAxYTQxODQ5MTliNmNjYWVhZGMwMDQ1N2M3In0.VqG9cGVGT0y0K9nWm-Ursq2ZDj0i7O0ljYOKmgvoRg8 --docker-email=${heisnamsomchand@alrajhibank.com.sa} --namespace=db2-dev
+
+Click OperatorHub
+Choose db2-dev project from Project drop down
+Click on IBM Db2 and click Install:
+Install into the db2-dev project under "Installed Namespace" Field:
+
+
+oc get svc | grep db2ucluster-db2dev1 | grep 'engn-svc' | cut -d ":" -f 2 | cut -d "/" -f1
+
+
+oc apply -f 'https://swc.saas.ibm.com/provisioning/v1/install/subscription?operatorName=db2u-operator&operatorNamespace=<operatorNamespace>&updateChannel=v110509.0&approvalStrategy=Automatic&catalog=ibm-operator-catalog'
+
+====Started the OpenShift cluster.
+
+The server is accessible via web console at:
+  https://console-openshift-console.apps-crc.testing
+
+Log in as administrator:
+  Username: kubeadmin
+  Password: 3eFzH-RPHDN-eXiXx-iyCkP
+
+Log in as user:
+  Username: developer
+  Password: developer
+
+Use the 'oc' command line interface:
+  > @FOR /f "tokens=*" %i IN ('crc oc-env') DO @call %i
+  > oc login -u developer https://api.crc.testing:6443
+ 
+oc login --token=sha256~K-gHeHwpvYyud2yFo-PXMAl_pwh4Cp4Rty47_5qPiBU --server=https://api.crc.testing:6443
+oc login -u kubeadmin https://api.crc.testing:6443
+oc get nodes
+oc debug node/crc
+
+curl -sL https://swc.saas.ibm.com/provisioning/v1/scripts/update-global-pull-secret | bash -s sha256~K-gHeHwpvYyud2yFo-PXMAl_pwh4Cp4Rty47_5qPiBU
+
+IBM Entitlement key:
+eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJJQk0gTWFya2V0cGxhY2UiLCJpYXQiOjE3MTkwMDc3NTIsImp0aSI6IjIwZTNmNzAxYTQxODQ5MTliNmNjYWVhZGMwMDQ1N2M3In0.VqG9cGVGT0y0K9nWm-Ursq2ZDj0i7O0ljYOKmgvoRg8
+
+Chapter 1:
+Commands --
+oc new-project chapter1
+oc new-app --name hello --image quay.io/redhattraining/hello-world-nginx:v1.0
+oc expose service hello
+oc get all
+oc get pod -o wide
+oc scale --replicas 4 deployment/hello
+oc delete project chapter1
+
+Chapter 2:
+commands--
+oc get clusterversion
+
+OpenShift Container Platform cluster operators are top level operators that manage the cluster. They are responsible for the main components, such as the API server, the web console, storage etc.
+oc get clusteroperators
+oc get nodes
+oc adm top node
+oc describe node master01
+oc get pod -n openshift-image-registry
+oc logs image-registry-77fb77f846-9vzt9 -n openshift-image-registry
+oc projects
+oc status
+oc get events
+
+
